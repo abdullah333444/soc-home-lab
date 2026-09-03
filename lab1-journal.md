@@ -16,3 +16,17 @@ Wazuh collects those logs centrally and runs detection rules against them.
 Key point: you can't detect what you never logged.
 
 **Next:** Run the Wazuh installation assistant, then build the Windows endpoint.
+
+
+
+
+
+
+**Wazuh 4.14 installed successfully** (indexer + manager + dashboard, single node).
+Dashboard reachable at https://192.168.68.58 — self-signed cert, browser warning expected.
+
+**Observation:** 298 alerts generated in 24h from the manager itself, with no agents
+enrolled — mostly SSH logins and sudo usage. First look at what alert noise means in
+practice.
+
+**Next:** Build the Windows 11 endpoint and enroll it as the first agent.
