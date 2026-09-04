@@ -66,3 +66,28 @@ the dependent config files, then restarted indexer, manager and dashboard.
 
 **Lesson:** Credential rotation in a multi-component stack has blast radius beyond the
 account you intended to change. Map service dependencies before rotating.
+
+
+
+
+
+
+
+## 2026-09-04 — Sysmon deployed
+
+**Did:** Installed Sysmon with the sysmon-modular configuration. Verified logging via
+Get-WinEvent against Microsoft-Windows-Sysmon/Operational.
+
+**First events observed:** Five consecutive Event ID 8 (CreateRemoteThread), tagged
+T1055 Process Injection. Source: dwm.exe from C:\Windows\System32, targeting a SYSTEM
+process. All legitimate — dwm.exe injects threads as part of normal window management.
+
+**Triage reasoning:** Legitimate binary, correct path, expected behaviour for that process,
+timing consistent with boot. Verdict: benign.
+
+**What would change the verdict:** the same event with a source like winword.exe or
+powershell.exe, a binary running outside System32, or a target such as lsass.exe.
+
+**Takeaway:** Sysmon's severity mapping describes the technique, not the intent. The first
+five events after deployment were all high-severity and all benign — a compact illustration
+of why untuned telemetry buries real detections.
