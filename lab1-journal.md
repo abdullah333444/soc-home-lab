@@ -22,8 +22,7 @@ Key point: you can't detect what you never logged.
 
 
 
-**Wazuh 4.14 installed successfully** (indexer + manager + dashboard, single node).
-Dashboard reachable at https://192.168.68.58 — self-signed cert, browser warning expected.
+
 
 
 
@@ -91,3 +90,24 @@ powershell.exe, a binary running outside System32, or a target such as lsass.exe
 **Takeaway:** Sysmon's severity mapping describes the technique, not the intent. The first
 five events after deployment were all high-severity and all benign — a compact illustration
 of why untuned telemetry buries real detections.
+
+
+## 2026-09-05 — First attack test: T1136 Create Account
+
+Created a local account named `backdoor` and added it to the administrators group.
+
+Both log sources detected it, but inconsistently:
+- Security channel: rules 60109 / 60110, level 8, mapped to T1098 Account Manipulation
+- Sysmon: rules 92031 / 92033 / 92039, level 3, mapped to Discovery
+
+The Sysmon classification is wrong — this was account creation and privilege escalation,
+not discovery. Built-in rules match on net.exe execution without inspecting the arguments,
+so `net user X /add` and plain `net user` enumeration look identical to them.
+
+The problem: the full command line only exists in the Sysmon event, which is the
+low-severity one. In an environment triaging at level 5+, the most useful forensic
+evidence would never be seen.
+
+See screenshots/t1136-sysmon-misclassified.png
+
+Next: write a custom rule matching net.exe with /add, mapped to T1136.001, level 12.
