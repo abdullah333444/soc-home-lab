@@ -108,6 +108,7 @@ The problem: the full command line only exists in the Sysmon event, which is the
 low-severity one. In an environment triaging at level 5+, the most useful forensic
 evidence would never be seen.
 
-See screenshots/t1136-sysmon-misclassified.png
+See screenshots/t1136-sysmon-misclassified.png and
+screenshots/t1136-security-channel-alerts.png
 
 Next: write a custom rule matching net.exe with /add, mapped to T1136.001, level 12.
