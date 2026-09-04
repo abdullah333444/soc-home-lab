@@ -49,3 +49,20 @@ enrolled — mostly SSH logins and sudo usage. First look at what alert noise me
 practice.
 
 **Next:** Build the Windows 11 endpoint and enroll it as the first agent.
+
+
+
+
+
+
+**Problem:** Dashboard returned HTTP 500 after rotating the admin password.
+
+**Cause:** The password tool rotates credentials for all internal users, including
+`kibanaserver` — the account the dashboard itself authenticates with. Rotating one
+credential silently broke a service dependency I wasn't aware of.
+
+**Fix:** Re-ran the tool with -a -A to regenerate all internal credentials and update
+the dependent config files, then restarted indexer, manager and dashboard.
+
+**Lesson:** Credential rotation in a multi-component stack has blast radius beyond the
+account you intended to change. Map service dependencies before rotating.
