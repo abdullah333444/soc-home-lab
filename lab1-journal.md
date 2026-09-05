@@ -141,3 +141,27 @@ custom rule raising severity to 12.
 
 See screenshots/t1070-logs-survive-after-clear.png and
 screenshots/t1070-clear-detected.png
+
+### Scheduled Task Persistence — T1053.005
+
+**Executed:** schtasks /create /tn "WindowsUpdate" /tr "calc.exe" /sc onlogon /ru System
+
+**Finding 1 — logging gap, not detection gap:** No alert fired initially. Investigation
+showed event 4698 was never logged — the audit subcategory "Other Object Access Events"
+is disabled by default in Windows. No SIEM can detect what the source never records.
+
+**Fix:** Enabled auditing via auditpol, recreated the task, confirmed event 4698 appears
+and reaches Wazuh (rule 60228, level 4).
+
+**Finding 2 — priority gap:** Rule 60228 fires at level 4 and alerts on ANY scheduled
+task, including legitimate ones — noisy in a real environment.
+
+**Custom rule 100102 (level 12):** Instead of raising severity for all tasks, matches the
+combination of two suspicious indicators in the task XML — runs as SYSTEM (S-1-5-18) AND
+triggers at logon. Legitimate user tasks rarely combine both, so false positives stay low.
+
+**Lesson:** Detection engineering starts at the log source. Verify telemetry exists before
+writing rules; default Windows auditing has blind spots for persistence techniques.
+
+See screenshots/t1053-detected-after-audit-fix.png and
+screenshots/t1053-custom-rule-detection.png
