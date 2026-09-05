@@ -201,3 +201,36 @@ and surfaces the excluded path in the alert.
 process-creation and script-block logging but fully visible in Defender's own log. Real
 coverage requires layered sources — Sysmon, Security, PowerShell, and Defender — each
 covering the others' blind spots.
+
+
+### LSASS Memory Access — T1003.001
+
+**Executed:** rundll32.exe comsvcs.dll, MiniDump <lsass_pid> lsass.dmp full
+
+**Result — attack fully blocked by the platform.** rundll32 returned "Access is denied" on
+every attempt. Windows 11's LSA Protection blocks reading lsass memory even from an elevated
+SYSTEM context.
+
+**Detection investigation — traced through every layer:**
+1. Sysmon Event 10 (ProcessAccess): sysmon-modular filters lsass access by default. Added a
+   targeted rule (TargetImage=lsass.exe) and confirmed Sysmon then logs Event 10 — but only
+   for legitimate system access (svchost/sysmain, GrantedAccess 0x2000). The malicious
+   attempt produced no Event 10, because LSA Protection denies access *before* the
+   ProcessAccess callback fires.
+2. Sysmon Event 1 (process creation): no event containing comsvcs/MiniDump was recorded —
+   the denial preempts full command-line capture.
+3. PowerShell Script Block Logging (4104): no comsvcs/MiniDump event reached Wazuh.
+4. Wazuh built-in rule 92900 (lsass credential-dump detection): requires GrantedAccess of
+   0x1010 or 0x40; the comsvcs path doesn't match, so even a successful dump on an
+   unprotected host would slip past the default rule.
+
+**Conclusion — platform-level protection creates a detection blind spot for the failed
+attempt.** On a hardened Windows 11 host, this technique fails so early that it leaves almost
+no telemetry. The only residual signal is the "Access is denied" error, visible only with
+command-line/terminal monitoring.
+
+**Lesson:** Strong preventive controls can reduce detective visibility. When the OS blocks an
+action pre-emptively, the attempt may never generate the events a SIEM relies on. Detection
+strategy must account for what prevention hides — and note that the same technique WOULD
+succeed and evade Wazuh's default rule on an older or unprotected host, which is where this
+detection gap becomes dangerous.
