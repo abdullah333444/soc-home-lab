@@ -26,4 +26,11 @@
       <id>T1053.005</id>
     </mitre>
   </rule>
+    <rule id="100104" level="12">
+    <if_sid>62154</if_sid>
+    <description>Defender configuration changed (possible T1562.001 tampering)</description>
+    <mitre>
+      <id>T1562.001</id>
+    </mitre>
+  </rule>
 </group>
