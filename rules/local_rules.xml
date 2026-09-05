@@ -17,5 +17,13 @@
       <id>T1098</id>
     </mitre>
   </rule>
-
+  <rule id="100102" level="12">
+    <if_sid>60228</if_sid>
+    <field name="win.eventdata.taskContent" type="pcre2">(?i)&lt;LogonTrigger&gt;</field>
+    <field name="win.eventdata.taskContent" type="pcre2">S-1-5-18</field>
+    <description>Suspicious scheduled task: runs as SYSTEM at logon (persistence)</description>
+    <mitre>
+      <id>T1053.005</id>
+    </mitre>
+  </rule>
 </group>
