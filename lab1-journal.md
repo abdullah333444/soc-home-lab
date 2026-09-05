@@ -165,3 +165,10 @@ writing rules; default Windows auditing has blind spots for persistence techniqu
 
 See screenshots/t1053-detected-after-audit-fix.png and
 screenshots/t1053-custom-rule-detection.png
+
+**Note:** Set-MpPreference -DisableRealtimeMonitoring did NOT disable protection —
+Get-MpPreference still showed False. Windows Tamper Protection blocked the change. This is
+a meaningful defensive control: a common evasion technique (T1562.001) fails against a
+default-hardened modern Windows host. An attacker would need to disable Tamper Protection
+first, which itself requires interactive access to the Defender UI or specific registry
+manipulation.
