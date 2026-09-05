@@ -112,3 +112,13 @@ See screenshots/t1136-sysmon-misclassified.png and
 screenshots/t1136-security-channel-alerts.png
 
 Next: write a custom rule matching net.exe with /add, mapped to T1136.001, level 12.
+
+
+
+**Custom rule 100100 works.** Same attack now fires at level 12, correctly mapped to
+T1136.001, with the command line surfaced directly in the alert description.
+
+Notable: Windows executed `net1 user testadmin ... /add`, not `net`. The regex used
+`net\d?` which caught it. A rule matching `net.exe` literally would have missed this
+entirely — and an attacker aware of the net/net1 aliasing could use it to evade
+naive detections.
