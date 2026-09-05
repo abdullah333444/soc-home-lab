@@ -172,3 +172,32 @@ a meaningful defensive control: a common evasion technique (T1562.001) fails aga
 default-hardened modern Windows host. An attacker would need to disable Tamper Protection
 first, which itself requires interactive access to the Defender UI or specific registry
 manipulation.
+
+### Impair Defenses: Defender Tampering — T1562.001
+
+**Executed:**
+Set-MpPreference -DisableRealtimeMonitoring $true
+Add-MpPreference -ExclusionPath "C:\Users\Public"
+
+**Finding 1 — Tamper Protection blocks the disable:**
+Set-MpPreference -DisableRealtimeMonitoring had no effect; Get-MpPreference still returned
+False. Windows Tamper Protection prevented it. A common evasion technique fails against a
+default-hardened modern host.
+
+**Finding 2 — the exclusion is nearly invisible:**
+Add-MpPreference -ExclusionPath succeeded (confirmed via Get-MpPreference), but:
+- Sysmon missed it — an internal cmdlet, not a new process (no Event ID 1).
+- PowerShell Script Block Logging (4104) captured other activity but produced no event for
+  the Add/Set-MpPreference cmdlets, even wrapped in an explicit script block. Verified absent
+  in the local Windows log, not just in Wazuh.
+
+**Resolution — the right source closes the gap:**
+Ingested Microsoft-Windows-Windows Defender/Operational. Event 5007 (rule 62154) records the
+configuration change directly, regardless of how it was invoked — capturing what Sysmon and
+Script Block Logging missed. Custom rule 100104 raises it to level 12, maps it to T1562.001,
+and surfaces the excluded path in the alert.
+
+**Lesson:** No single telemetry source is complete. This technique was invisible to
+process-creation and script-block logging but fully visible in Defender's own log. Real
+coverage requires layered sources — Sysmon, Security, PowerShell, and Defender — each
+covering the others' blind spots.
