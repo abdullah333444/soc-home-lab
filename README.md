@@ -51,6 +51,7 @@ Network: VirtualBox Bridged Adapter — both hosts on the same LAN segment.
 | 1 | `[technique name]` | `T####` | Yes | Built-in |
 | 2 | `[technique name]` | `T####` | No → Yes | Custom rule |
 | 3 | `[technique name]` | `T####` | Yes | Built-in |
+| 4 | Defender Tampering | T1562.001 | No → Yes | Defender channel + rule 100104 |
 
 **Result:** `[X]` of `[Y]` techniques detected out of the box. `[Z]` gaps identified and
 closed with custom detection rules.
