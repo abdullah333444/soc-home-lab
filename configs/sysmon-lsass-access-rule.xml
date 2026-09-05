@@ -1,0 +1,7 @@
+<!--
+  Custom Sysmon ProcessAccess rule added to sysmon-modular's <ProcessAccess> include block.
+  Logs any process opening a handle to lsass.exe (Event ID 10), which sysmon-modular
+  filters out by default. Broadens visibility into credential-dumping attempts (T1003.001)
+  beyond the default CallTrace-based rules.
+-->
+<TargetImage name="technique_id=T1003.001,technique_name=LSASS Access" condition="image">lsass.exe</TargetImage>
