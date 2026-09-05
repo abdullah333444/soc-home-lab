@@ -1,0 +1,21 @@
+<group name="sysmon,attack,custom">
+
+  <rule id="100100" level="12">
+    <if_sid>92031,92033,92039</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)net\d?\s+user\s+\S+.*\s+/add</field>
+    <description>Local account created via net.exe: $(win.eventdata.commandLine)</description>
+    <mitre>
+      <id>T1136.001</id>
+    </mitre>
+  </rule>
+
+  <rule id="100101" level="12">
+    <if_sid>92031,92033,92039</if_sid>
+    <field name="win.eventdata.commandLine" type="pcre2">(?i)net\d?\s+localgroup\s+administrators\s+\S+\s+/add</field>
+    <description>Account added to local Administrators group: $(win.eventdata.commandLine)</description>
+    <mitre>
+      <id>T1098</id>
+    </mitre>
+  </rule>
+
+</group>
