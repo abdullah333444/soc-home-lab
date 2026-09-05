@@ -122,3 +122,22 @@ Notable: Windows executed `net1 user testadmin ... /add`, not `net`. The regex u
 `net\d?` which caught it. A rule matching `net.exe` literally would have missed this
 entirely — and an attacker aware of the net/net1 aliasing could use it to evade
 naive detections.
+
+### Clear Event Logs — T1070.001
+
+**Executed:** wevtutil cl Security
+
+**Finding 1 — logs survive centralization:** After clearing the local Security log, the
+backdoor account-creation events (02:31:25) were gone from the endpoint but still fully
+visible in Wazuh. They were forwarded to the manager when they occurred; clearing the host
+cannot reach them.
+
+**Finding 2 — the clear itself is detected:** Rule 63103 "The audit log was cleared",
+level 5, event 1102. Windows logs the clear action as the final entry before wiping, so
+it is not silent.
+
+**Priority gap:** Level 5 is low for an action that is rarely legitimate. Candidate for a
+custom rule raising severity to 12.
+
+See screenshots/t1070-logs-survive-after-clear.png and
+screenshots/t1070-clear-detected.png
